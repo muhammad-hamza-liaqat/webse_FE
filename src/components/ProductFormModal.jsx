@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from '@mui/material';
+import axios from 'axios';
 
 const ProductFormModal = ({ isOpen, onClose, onSave, product }) => {
   const [formData, setFormData] = useState({
@@ -41,20 +42,23 @@ const ProductFormModal = ({ isOpen, onClose, onSave, product }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const productData = {
-      productTitle: formData.name,  
-      productDescription: formData.description,
-      price: parseFloat(formData.price),
-      quantity: parseInt(formData.quantity, 10),
-      image: formData.image,
-    };
+    const productData = new FormData();
+    productData.append('productTitle', formData.name);
+    productData.append('productDescription', formData.description);
+    productData.append('price', parseFloat(formData.price));
+    productData.append('quantity', parseInt(formData.quantity, 10));
 
-    if (isNaN(productData.price) || isNaN(productData.quantity)) {
+    if (formData.image) {
+      productData.append('image', formData.image); 
+    }
+
+    if (isNaN(productData.get('price')) || isNaN(productData.get('quantity'))) {
       alert('Please enter valid numbers for price and quantity.');
       return;
     }
 
     onSave(productData);
+
     setFormData({ name: '', price: '', description: '', quantity: '', image: null });
   };
 
